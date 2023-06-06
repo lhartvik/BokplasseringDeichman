@@ -11,16 +11,17 @@ import {
 } from 'react-native';
 import {sok} from '../util/deichmanSok';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {useAsyncStorage} from '../util/useAsyncStorage';
 const Bokliste = () => {
   const [searchText, setSearchText] = useState('');
-  const [books, setBooks] = useState([]);
   const [error, setError] = useState('');
 
   const isDarkMode = useColorScheme() === 'dark';
+  const [bookstore, saveBooks, clearBooks] = useAsyncStorage('books');
 
   const fetchData = async () => {
     if (searchText === '') return;
-    if (books.map(b => b.key).includes(searchText)) {
+    if (bookstore.map(b => b.key).includes(searchText)) {
       setError('Boken er allerede i listen');
       return;
     }
@@ -29,14 +30,16 @@ const Bokliste = () => {
       const data = await sok(Number(searchText));
 
       if (!data) throw Error('Fant ikke boken på Bjørvika');
-      else setBooks(() => [...books, data]);
+      else await saveBooks([...bookstore, data]);
     } catch (e) {
       setError('Feilmelding : ' + e.message);
     }
   };
 
-const handleDelete = key =>
-  setBooks(() => books.filter(book => book.key !== key));
+  const handleDelete = key =>
+    bookstore.length === 1
+      ? clearBooks()
+      : saveBooks(() => bookstore.filter(book => book.key !== key));
 
   const renderItem = item => (
     <View
@@ -66,7 +69,7 @@ const handleDelete = key =>
         placeholder="Skriv inn Tittelnummer"
       />
       <Button title="Search" onPress={fetchData} />
-      <ScrollView>{books && books.map(renderItem)}</ScrollView>
+      <ScrollView>{bookstore && bookstore.map(renderItem)}</ScrollView>
       <Modal visible={error !== ''} animationType="fade">
         <View
           style={{
