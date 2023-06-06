@@ -28,9 +28,15 @@ const Bokliste = () => {
     try {
       // Make an asynchronous call to retrieve the data
       const data = await sok(Number(searchText));
-
       if (!data) throw Error('Fant ikke boken på Bjørvika');
-      else await saveBooks([...bookstore, data]);
+      if (data.available === 0)
+        throw Error(
+          'Ingen bøker er tilgjengelig' +
+            (data.status ? ': ' + data.status : ''),
+        );
+      else {
+        await saveBooks([...bookstore, data]);
+      }
     } catch (e) {
       setError('Feilmelding : ' + e.message);
     }
@@ -52,7 +58,7 @@ const Bokliste = () => {
       <Text style={styles.bookTitle}>{item.tittel}</Text>
       <View style={{flexDirection: 'row'}}>
         <Text style={{marginRight: 10}}>
-          {item.locLabel} {item.shelfmark}
+          {item.locLabel + ' ' + item.shelfmark}
         </Text>
         <Button title={'Slett'} onPress={() => handleDelete(item.key)} />
       </View>
