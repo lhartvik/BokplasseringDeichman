@@ -57,9 +57,9 @@ const Bokliste = () => {
       }}>
       <Text style={styles.bookTitle}>{item.tittel}</Text>
       <View style={{flexDirection: 'row'}}>
-        <Text style={{marginRight: 10}}>
-          {item.locLabel + ' ' + item.shelfmark}
-        </Text>
+        <View style={{flex: 1}}>
+          <Text>{item.locLabel + ' ' + item.shelfmark}</Text>
+        </View>
         <Button title={'Slett'} onPress={() => handleDelete(item.key)} />
       </View>
     </View>
