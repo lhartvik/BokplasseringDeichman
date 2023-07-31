@@ -12,6 +12,7 @@ import {
 import {sok} from '../util/deichmanSok';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {useAsyncStorage} from '../util/useAsyncStorage';
+import BokView from './Bok';
 const Bokliste = () => {
   const [searchText, setSearchText] = useState('');
   const [error, setError] = useState('');
@@ -42,27 +43,20 @@ const Bokliste = () => {
     }
   };
 
-  const handleDelete = key =>
+  const handleDelete = key => {
     bookstore.length === 1
       ? clearBooks()
-      : saveBooks(() => bookstore.filter(book => book.key !== key));
-
+      : saveBooks(bookstore.filter(book => book.key !== key));
+  };
   const renderItem = item => (
-    <View
+    <BokView
       key={item.key}
-      style={{
-        backgroundColor: isDarkMode ? Colors.black : Colors.white,
-        borderBottomColor: !isDarkMode ? Colors.black : Colors.white,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-      }}>
-      <Text style={styles.bookTitle}>{item.tittel}</Text>
-      <View style={{flexDirection: 'row'}}>
-        <View style={{flex: 1}}>
-          <Text>{item.locLabel + ' ' + item.shelfmark}</Text>
-        </View>
-        <Button title={'Slett'} onPress={() => handleDelete(item.key)} />
-      </View>
-    </View>
+      locLabel={item.locLabel}
+      tittel={item.tittel}
+      shelfmark={item.shelfmark}
+      isDarkMode={isDarkMode}
+      handleDelete={() => handleDelete(item.key)}
+    />
   );
 
   return (
@@ -115,7 +109,7 @@ const Bokliste = () => {
   );
 };
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   bookContainer: {
     marginTop: 32,
     paddingHorizontal: 24,
